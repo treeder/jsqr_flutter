@@ -8,13 +8,13 @@ NOTE: Flutter web only.
 
 ```dart
  var code = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            title: const Text('Scan QR Code'),
-            children: <Widget>[
-              SizedBox(height: 300, child: Scanner()),
-            ],
-          );
-        });
+    context: context,
+    builder: (BuildContext context) {
+        return SimpleDialog(
+        title: const Text('Scan QR Code'),
+        children: <Widget>[
+            SizedBox(height: 300, child: Scanner()),
+        ],
+        );
+    });
 ```
