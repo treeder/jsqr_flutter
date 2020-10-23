@@ -6,6 +6,14 @@ NOTE: Flutter web only.
 
 ## Usage
 
+Add this to `web/index.html`:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
+```
+
+Then in your code:
+
 ```dart
  var code = await showDialog(
     context: context,
