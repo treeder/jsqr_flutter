@@ -1,6 +1,6 @@
 name: jsqr
 description: jsqr wrapper and widget for Flutter web.
-version: 0.0.3
+version: 0.0.5
 homepage: https://github.com/treeder
 repository: https://github.com/treeder/jsqr_flutter
 issue_tracker: https://github.com/treeder/jsqr_flutter/issues
@@ -13,7 +13,10 @@ dependencies:
   flutter:
     sdk: flutter
   js: ^0.6.2
-  flutter_webrtc: ^0.4.0
+  # flutter_webrtc: # ^0.4.0
+  #   git:
+  #     url: https://github.com/flutter-webrtc/flutter-webrtc.git
+  #     ref: master
 
 dev_dependencies:
   flutter_test:
