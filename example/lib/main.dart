@@ -50,11 +50,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String code;
   // Future<List<dynamic>> sourcesF;
+  Future<bool> camAvailableF;
 
   @override
   void initState() {
     super.initState();
     // sourcesF = navigator.mediaDevices.getSources();
+    camAvailableF = Scanner.cameraAvailable();
   }
 
   void _incrementCounter() async {
@@ -120,6 +122,23 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            FutureBuilder<bool>(
+              future: camAvailableF,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text("ERROR: ${snapshot.error}");
+                }
+                if (snapshot.hasData) {
+                  if (snapshot.data) {
+                    return (Text("Camera is available"));
+                  }
+                  return (Text("No camera available"));
+                } else {
+                  // We can show the loading view until the data comes back.
+                  return CircularProgressIndicator();
+                }
+              },
+            ),
             Text(
               'You have pushed the button this many times:',
             ),
@@ -154,8 +173,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        tooltip: 'Scan',
+        child: Icon(Icons.camera_alt),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

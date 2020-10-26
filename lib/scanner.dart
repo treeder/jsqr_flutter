@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:html' as html;
-import 'dart:html';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -15,16 +14,32 @@ class Scanner extends StatefulWidget {
   @override
   _ScannerState createState() => _ScannerState();
 
-  static DivElement vidDiv =
-      DivElement(); // need a global for the registerViewFactory
+  static html.DivElement vidDiv =
+      html.DivElement(); // need a global for the registerViewFactory
+
+  static Future<bool> cameraAvailable() async {
+    List<dynamic> sources =
+        await html.window.navigator.mediaDevices.enumerateDevices();
+    print("sources:");
+    // List<String> vidIds = [];
+    bool hasCam = false;
+    for (final e in sources) {
+      print(e);
+      if (e.kind == 'videoinput') {
+        // vidIds.add(e['deviceId']);
+        hasCam = true;
+      }
+    }
+    return hasCam;
+  }
 }
 
 class _ScannerState extends State<Scanner> {
-  MediaStream _localStream;
+  html.MediaStream _localStream;
   // final _localRenderer = RTCVideoRenderer();
   bool _inCalling = false;
   bool _isTorchOn = false;
-  MediaRecorder _mediaRecorder;
+  html.MediaRecorder _mediaRecorder;
   bool get _isRec => _mediaRecorder != null;
   Timer timer;
   String code;
@@ -37,7 +52,7 @@ class _ScannerState extends State<Scanner> {
   void initState() {
     print("MY SCANNER initState");
     super.initState();
-    video = VideoElement();
+    video = html.VideoElement();
     Scanner.vidDiv.children = [video];
     // ignore: UNDEFINED_PREFIXED_NAME
     ui.platformViewRegistry
@@ -89,43 +104,9 @@ class _ScannerState extends State<Scanner> {
     if (_localStream != null) {
       return;
     }
-    List<dynamic> sources =
-        await window.navigator.mediaDevices.enumerateDevices();
-    print("sources:");
-    List<String> vidIds = [];
-    for (final e in sources) {
-      print(e);
-      // if (e['kind'] == 'videoinput') {
-      // vidIds.add(e['deviceId']);
-      // }
-    }
-    // String deviceId = vidIds.length == 1
-    //     ? vidIds[0]
-    //     : vidIds[vidIds.length - 1]; // I have 2 front and 1 back on my phone
-    // TODO I can't get the back camera to work for the life of me
-    Map<String, dynamic> mediaConstraints = {
-      'audio': false,
-      'video': {
-        // 'mandatory': {
-        //   'minWidth': 640, // Provide your own width, height and frame rate here
-        //   'minHeight': 480,
-        //   'minFrameRate': 30,
-        // },
-        'facingMode': 'environment',
-        // 'optional': [
-        //   {
-        //     'sourceId': vidIds.length == 1
-        //         ? vidIds[0]
-        //         : vidIds[
-        //             vidIds.length - 1] // I have 2 front and 1 back on my phone
-        //   }
-        // ],
-        // 'deviceId': deviceId,
-      }
-    };
 
     try {
-      var stream = await window.navigator.getUserMedia(
+      var stream = await html.window.navigator.getUserMedia(
           video: {'facingMode': (front ? "user" : "environment")});
       _localStream = stream;
       video.srcObject = _localStream;
