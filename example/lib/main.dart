@@ -134,7 +134,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                   return (Text("No camera available"));
                 } else {
-                  // We can show the loading view until the data comes back.
                   return CircularProgressIndicator();
                 }
               },

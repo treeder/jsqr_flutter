@@ -36,7 +36,8 @@ class Scanner extends StatefulWidget {
 
 class _ScannerState extends State<Scanner> {
   html.MediaStream _localStream;
-  // final _localRenderer = RTCVideoRenderer();
+  html.CanvasElement canvas;
+  html.CanvasRenderingContext2D ctx;
   bool _inCalling = false;
   bool _isTorchOn = false;
   html.MediaRecorder _mediaRecorder;
@@ -53,6 +54,8 @@ class _ScannerState extends State<Scanner> {
     print("MY SCANNER initState");
     super.initState();
     video = html.VideoElement();
+    canvas = new html.CanvasElement();
+    ctx = canvas.context2D;
     Scanner.vidDiv.children = [video];
     // ignore: UNDEFINED_PREFIXED_NAME
     ui.platformViewRegistry
@@ -91,13 +94,8 @@ class _ScannerState extends State<Scanner> {
     if (_inCalling) {
       _stopStream();
     }
-    // _localRenderer.dispose();
     super.dispose();
   }
-
-  // void initRenderers() async {
-  //   await _localRenderer.initialize();
-  // }
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> _makeCall() async {
@@ -106,12 +104,20 @@ class _ScannerState extends State<Scanner> {
     }
 
     try {
-      var stream = await html.window.navigator.getUserMedia(
-          video: {'facingMode': (front ? "user" : "environment")});
+      var stream = await html.window.navigator.mediaDevices.getUserMedia({
+        'audio': false,
+        'video': {
+          'facingMode': (front ? "user" : "environment"),
+          // 'width': 480, // could swap these if landscape mode
+          // 'height': 640
+        }
+      });
       _localStream = stream;
-      video.srcObject = _localStream;
+      // video.setAttribute('autoplay', '');
+      // video.setAttribute('muted', '');
       video.setAttribute("playsinline",
           'true'); // required to tell iOS safari we don't want fullscreen
+      video.srcObject = _localStream;
       await video.play();
     } catch (e) {
       print(e.toString());
@@ -149,21 +155,6 @@ class _ScannerState extends State<Scanner> {
     }
   }
 
-  // void _toggleTorch() async {
-  //   final videoTrack = _localStream
-  //       .getVideoTracks()
-  //       .firstWhere((track) => track.kind == 'video');
-  //   final has = await videoTrack.hasTorch();
-  //   if (has) {
-  //     print('[TORCH] Current camera supports torch mode');
-  //     setState(() => _isTorchOn = !_isTorchOn);
-  //     await videoTrack.setTorch(_isTorchOn);
-  //     print('[TORCH] Torch state is now ${_isTorchOn ? 'on' : 'off'}');
-  //   } else {
-  //     print('[TORCH] Current camera does not support torch mode');
-  //   }
-  // }
-
   _toggleCamera() async {
     final videoTrack = _localStream
         .getVideoTracks()
@@ -178,35 +169,7 @@ class _ScannerState extends State<Scanner> {
       print("localstream is null, can't capture frame");
       return null;
     }
-    final videoTrack = _localStream
-        .getVideoTracks()
-        .firstWhere((track) => track.kind == 'video');
-    // var durl = await videoTrack.captureFrame();
 
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
-    html.CanvasElement canvas =
-        new html.CanvasElement(width: width.toInt(), height: height.toInt());
-    html.CanvasRenderingContext2D ctx = canvas.context2D;
-    // var image = html.ImageElement();
-    // image.addEventListener('load', (event) {
-    //   print("image loaded");
-    //   canvas.width = image.width;
-    //   canvas.height = image.height;
-    //   ctx.drawImage(image, 0, 0);
-    //   html.ImageData imgData =
-    //       ctx.getImageData(0, 0, canvas.width, canvas.height);
-    //   print(imgData);
-    //   // resolve(context.getImageData(0, 0, canvas.width, canvas.height));
-    //   // view-source:https://cozmo.github.io/jsQR/
-    //   var code = jsQR(imgData.data, canvas.width, canvas.height);
-    //   print("CODE: $code");
-    //   if (code != null) {
-    //     print(code.data);
-    //     this.code = code.data;
-    //   }
-    // });
-    // image.src = durl;
     canvas.height = video.videoHeight;
     canvas.width = video.videoWidth;
     ctx.drawImage(video, 0, 0);
