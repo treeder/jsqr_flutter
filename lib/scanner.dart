@@ -54,8 +54,8 @@ class _ScannerState extends State<Scanner> {
     print("MY SCANNER initState");
     super.initState();
     video = html.VideoElement();
-    canvas = new html.CanvasElement();
-    ctx = canvas.context2D;
+    // canvas = new html.CanvasElement(width: );
+    // ctx = canvas.context2D;
     Scanner.vidDiv.children = [video];
     // ignore: UNDEFINED_PREFIXED_NAME
     ui.platformViewRegistry
@@ -170,6 +170,11 @@ class _ScannerState extends State<Scanner> {
       return null;
     }
 
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    html.CanvasElement canvas =
+        new html.CanvasElement(width: width.toInt(), height: height.toInt());
+    html.CanvasRenderingContext2D ctx = canvas.context2D;
     canvas.height = video.videoHeight;
     canvas.width = video.videoWidth;
     ctx.drawImage(video, 0, 0);
