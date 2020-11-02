@@ -95,15 +95,15 @@ class _ScannerState extends State<Scanner> {
       timer.cancel();
       timer = null;
     }
+    if (_inCalling) {
+      _stopStream();
+    }
   }
 
   @override
   void dispose() {
     print("Scanner.dispose");
     cancel();
-    if (_inCalling) {
-      _stopStream();
-    }
     super.dispose();
   }
 
@@ -159,6 +159,8 @@ class _ScannerState extends State<Scanner> {
           track.stop();
         }
       });
+      // video.stop();
+      video.srcObject = null;
       _localStream = null;
       // _localRenderer.srcObject = null;
     } catch (e) {
