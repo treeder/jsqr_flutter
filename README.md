@@ -15,14 +15,23 @@ Add this to `web/index.html`:
 Then in your code:
 
 ```dart
- var code = await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-        return SimpleDialog(
-        title: const Text('Scan QR Code'),
-        children: <Widget>[
-            SizedBox(height: 300, child: Scanner()),
-        ],
-        );
-    });
+var code = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          var height = MediaQuery.of(context).size.height;
+          var width = MediaQuery.of(context).size.width;
+          return AlertDialog(
+            insetPadding: EdgeInsets.all(5),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: const Text('Scan QR Code'),
+            content: Container(
+                // height: height - 20,
+                width: width - 6,
+                child: Scanner()),
+          );
+        });
 ```
+
+See /example for full usage.
+
