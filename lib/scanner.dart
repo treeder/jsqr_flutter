@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:html' as html;
+import 'dart:js_util';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 // import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'jsqr.dart';
+import 'media.dart';
 
 class Scanner extends StatefulWidget {
   const Scanner({Key key}) : super(key: key);
@@ -84,13 +86,17 @@ class _ScannerState extends State<Scanner> {
     }
   }
 
-  @override
-  void dispose() {
-    print("Scanner.dispose");
+  void cancel() {
     if (timer != null) {
       timer.cancel();
       timer = null;
     }
+  }
+
+  @override
+  void dispose() {
+    print("Scanner.dispose");
+    cancel();
     if (_inCalling) {
       _stopStream();
     }
@@ -104,23 +110,24 @@ class _ScannerState extends State<Scanner> {
     }
 
     try {
-      var stream = await html.window.navigator.mediaDevices.getUserMedia({
-        'audio': false,
-        'video': {
-          'facingMode': (front ? "user" : "environment"),
-          // 'width': 480, // could swap these if landscape mode
-          // 'height': 640
-        }
-      });
+      var constraints = UserMediaOptions(
+          // audio: false,
+          video: VideoOptions(
+        facingMode: (front ? "user" : "environment"),
+      ));
+      // dart style, not working properly:
+      // var stream =
+      //     await html.window.navigator.mediaDevices.getUserMedia(constraints);
+      // straight JS:
+      var stream = await promiseToFuture(getUserMedia(constraints));
       _localStream = stream;
-      // video.setAttribute('autoplay', '');
-      // video.setAttribute('muted', '');
+      video.srcObject = _localStream;
       video.setAttribute("playsinline",
           'true'); // required to tell iOS safari we don't want fullscreen
-      video.srcObject = _localStream;
       await video.play();
     } catch (e) {
-      print(e.toString());
+      print("error on getUserMedia: ${e.toString()}");
+      cancel();
       setState(() {
         _errorMsg = e.toString();
       });

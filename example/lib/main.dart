@@ -63,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
     var code = await showDialog(
         context: context,
         builder: (BuildContext context) {
-          var height = MediaQuery.of(context).size.height;
-          var width = MediaQuery.of(context).size.width;
+          // var height = MediaQuery.of(context).size.height;
+          // var width = MediaQuery.of(context).size.width;
           return AlertDialog(
             insetPadding: EdgeInsets.all(5),
             shape: RoundedRectangleBorder(
@@ -72,7 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Scan QR Code'),
             content: Container(
                 // height: height - 20,
-                width: width - 6,
+                width: 640,
+                height: 480,
                 child: Scanner()),
           );
         });
