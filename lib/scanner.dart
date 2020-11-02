@@ -70,21 +70,24 @@ class _ScannerState extends State<Scanner> {
 
   void start() async {
     await _makeCall();
-    if (timer == null || !timer.isActive) {
-      timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
-        if (code != null) {
-          timer.cancel();
-          Navigator.pop(context, code);
-          return;
-        }
-        _captureFrame2();
-        if (code != null) {
-          timer.cancel();
-          Navigator.pop(context, code);
-        }
-      });
-    }
+    // if (timer == null || !timer.isActive) {
+    //   timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
+    //     if (code != null) {
+    //       timer.cancel();
+    //       Navigator.pop(context, code);
+    //       return;
+    //     }
+    //     _captureFrame2();
+    //     if (code != null) {
+    //       timer.cancel();
+    //       Navigator.pop(context, code);
+    //     }
+    //   });
+    // }
     // instead of periodic, which seems to have some timing issues, going to call timer AFTER the capture.
+    Timer(Duration(milliseconds: 200), () {
+      _captureFrame2();
+    });
   }
 
   void cancel() {
@@ -196,6 +199,12 @@ class _ScannerState extends State<Scanner> {
     if (code != null) {
       print(code.data);
       this.code = code.data;
+      Navigator.pop(context, this.code);
+      return this.code;
+    } else {
+      Timer(Duration(milliseconds: 500), () {
+        _captureFrame2();
+      });
     }
   }
 
