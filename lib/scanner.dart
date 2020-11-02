@@ -69,7 +69,7 @@ class _ScannerState extends State<Scanner> {
   }
 
   void start() async {
-    _makeCall();
+    await _makeCall();
     if (timer == null || !timer.isActive) {
       timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
         if (code != null) {
@@ -84,6 +84,7 @@ class _ScannerState extends State<Scanner> {
         }
       });
     }
+    // instead of periodic, which seems to have some timing issues, going to call timer AFTER the capture.
   }
 
   void cancel() {
