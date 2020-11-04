@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jsqr/scanner.dart';
+import 'dart:html' as html;
+import 'dart:ui' as ui;
 
 void main() {
   runApp(MyApp());
@@ -51,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String code;
   // Future<List<dynamic>> sourcesF;
   Future<bool> camAvailableF;
+  html.ImageElement img;
 
   @override
   void initState() {
@@ -59,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
     camAvailableF = Scanner.cameraAvailable();
   }
 
-  void _incrementCounter() async {
+  void _openScan() async {
     var code = await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -85,6 +88,48 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       this.code = code;
+      _counter++;
+    });
+  }
+
+  void _captureImage() async {
+    var dataUrl = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // var height = MediaQuery.of(context).size.height;
+          // var width = MediaQuery.of(context).size.width;
+          return AlertDialog(
+            insetPadding: EdgeInsets.all(5),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: const Text('Scan QR Code'),
+            content: Container(
+                // height: height - 20,
+                width: 640,
+                height: 480,
+                child: Scanner(
+                  clickToCapture: true,
+                )),
+          );
+        });
+    print("IMG URL: $dataUrl");
+    html.DivElement vidDiv =
+        html.DivElement(); // need a global for the registerViewFactory
+
+    // ignore: UNDEFINED_PREFIXED_NAME
+    ui.platformViewRegistry.registerViewFactory("cap", (int id) => vidDiv);
+
+    img = new html.ImageElement();
+    img.src = dataUrl;
+    vidDiv.children = [img];
+    // html.document.body.children.add(img);
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      // this.code = code;
       _counter++;
     });
   }
@@ -168,14 +213,30 @@ class _MyHomePageState extends State<MyHomePage> {
             //     }
             //   },
             // )
+            SizedBox(height: 10),
+            RaisedButton(
+              child: Text("Scan QR Code"),
+              onPressed: _openScan,
+            ),
+            SizedBox(height: 10),
+            RaisedButton(
+              child: Text("Capture Image"),
+              onPressed: _captureImage,
+            ),
+            SizedBox(height: 10),
+            if (img != null)
+              SizedBox(
+                  width: 640,
+                  height: 480,
+                  child: HtmlElementView(viewType: "cap")),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Scan',
-        child: Icon(Icons.camera_alt),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _openScan,
+      //   tooltip: 'Scan',
+      //   child: Icon(Icons.camera_alt),
+      // ),
     );
   }
 }

@@ -35,3 +35,6 @@ var code = await showDialog(
 
 See /example for full usage.
 
+You can also capture an image too by passing in `clickToCapture: true`, see /example for how.
+
+

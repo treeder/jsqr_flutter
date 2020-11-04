@@ -5,13 +5,15 @@ import 'dart:js_util';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-// import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'jsqr.dart';
 import 'media.dart';
 
 class Scanner extends StatefulWidget {
-  const Scanner({Key key}) : super(key: key);
+  /// clickToCapture to show a button to capture a Data URL for the image
+  final bool clickToCapture;
+
+  const Scanner({this.clickToCapture = false, key}) : super(key: key);
 
   @override
   _ScannerState createState() => _ScannerState();
@@ -38,8 +40,8 @@ class Scanner extends StatefulWidget {
 
 class _ScannerState extends State<Scanner> {
   html.MediaStream _localStream;
-  html.CanvasElement canvas;
-  html.CanvasRenderingContext2D ctx;
+  // html.CanvasElement canvas;
+  // html.CanvasRenderingContext2D ctx;
   bool _inCalling = false;
   bool _isTorchOn = false;
   html.MediaRecorder _mediaRecorder;
@@ -84,10 +86,12 @@ class _ScannerState extends State<Scanner> {
     //     }
     //   });
     // }
-    // instead of periodic, which seems to have some timing issues, going to call timer AFTER the capture.
-    Timer(Duration(milliseconds: 200), () {
-      _captureFrame2();
-    });
+    if (!widget.clickToCapture) {
+      // instead of periodic, which seems to have some timing issues, going to call timer AFTER the capture.
+      Timer(Duration(milliseconds: 200), () {
+        _captureFrame2();
+      });
+    }
   }
 
   void cancel() {
@@ -182,22 +186,17 @@ class _ScannerState extends State<Scanner> {
       print("localstream is null, can't capture frame");
       return null;
     }
-
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
-    html.CanvasElement canvas =
-        new html.CanvasElement(width: width.toInt(), height: height.toInt());
+    html.CanvasElement canvas = new html.CanvasElement(
+        width: video.videoWidth, height: video.videoHeight);
     html.CanvasRenderingContext2D ctx = canvas.context2D;
-    canvas.height = video.videoHeight;
-    canvas.width = video.videoWidth;
+    // canvas.width = video.videoWidth;
+    // canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0);
     html.ImageData imgData =
         ctx.getImageData(0, 0, canvas.width, canvas.height);
-    print(imgData);
-    // resolve(context.getImageData(0, 0, canvas.width, canvas.height));
-    // view-source:https://cozmo.github.io/jsQR/
+    // print(imgData);
     var code = jsQR(imgData.data, canvas.width, canvas.height);
-    print("CODE: $code");
+    // print("CODE: $code");
     if (code != null) {
       print(code.data);
       this.code = code.data;
@@ -210,13 +209,27 @@ class _ScannerState extends State<Scanner> {
     }
   }
 
+  Future<String> _captureImage() async {
+    if (_localStream == null) {
+      print("localstream is null, can't capture frame");
+      return null;
+    }
+    html.CanvasElement canvas = new html.CanvasElement(
+        width: video.videoWidth, height: video.videoHeight);
+    html.CanvasRenderingContext2D ctx = canvas.context2D;
+    // canvas.width = video.videoWidth;
+    // canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    var dataUrl = canvas.toDataUrl("image/jpeg", 0.9);
+    return dataUrl;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_errorMsg != null) {
       return Center(child: Text(_errorMsg));
     }
     if (_localStream == null) {
-      // _makeCall();
       return Text("Loading...");
     }
     return Column(children: [
@@ -244,6 +257,15 @@ class _ScannerState extends State<Scanner> {
       //   icon: Icon(Icons.switch_video),
       //   onPressed: _toggleCamera,
       // ),
+      if (widget.clickToCapture)
+        IconButton(
+          icon: Icon(Icons.camera),
+          onPressed: () async {
+            var imgUrl = await _captureImage();
+            print("Image URL: $imgUrl");
+            Navigator.pop(context, imgUrl);
+          },
+        ),
     ]);
   }
 }
