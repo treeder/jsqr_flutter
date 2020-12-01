@@ -1,6 +1,6 @@
 # jsqr_flutter
 
-jsqr wrapper and widget for flutter web
+A QR Code Scanner and image capturing library for Flutter. Uses [jsqr](https://github.com/cozmo/jsQR) under the hood for QR codes.
 
 NOTE: Flutter web only.
 
@@ -12,7 +12,9 @@ Add this to `web/index.html`:
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
 ```
 
-Then in your code:
+## Scaning for QR codes
+
+Example code:
 
 ```dart
 var code = await showDialog(
@@ -33,8 +35,10 @@ var code = await showDialog(
         });
 ```
 
-See /example for full usage.
+The `code` var will contain the data contained in the QR code. 
 
-You can also capture an image too by passing in `clickToCapture: true`, see /example for how.
+See [/example](/example) for full example and usage. 
 
+## Image Capture
 
+You can also capture an image too by passing in `clickToCapture: true`, see [/example](/exaple) for how to use it.
