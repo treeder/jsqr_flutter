@@ -12,7 +12,7 @@ external Promise<MediaStream> getUserMedia(UserMediaOptions options);
 class UserMediaOptions {
   external VideoOptions get video;
 
-  external factory UserMediaOptions({VideoOptions video});
+  external factory UserMediaOptions({VideoOptions? video});
 }
 
 @JS()
@@ -22,7 +22,7 @@ class VideoOptions {
   external DeviceIdOptions get deviceId;
 
   external factory VideoOptions(
-      {String facingMode = null, DeviceIdOptions deviceId = null});
+      {String? facingMode = null, DeviceIdOptions? deviceId = null});
 }
 
 @JS()
@@ -30,20 +30,20 @@ class VideoOptions {
 class DeviceIdOptions {
   external String get exact;
 
-  external factory DeviceIdOptions({String exact});
+  external factory DeviceIdOptions({String? exact});
 }
 
 @JS()
 class JsQRScanner {
   external factory JsQRScanner(Function onQRCodeScanned, Function provideVideo);
   external setSnapImageMaxSize(int maxSize);
-  external removeFrom(Element element);
-  external appendTo(Element element);
+  external removeFrom(Element? element);
+  external appendTo(Element? element);
   external stopScanning();
 }
 
 @JS()
 class Promise<T> {
   external Promise(void executor(void resolve(T result), Function reject));
-  external Promise then(void onFulfilled(T result), [Function onRejected]);
+  external Promise then(void onFulfilled(T result), [Function? onRejected]);
 }

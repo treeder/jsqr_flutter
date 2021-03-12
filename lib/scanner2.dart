@@ -10,17 +10,17 @@ import 'package:js/js_util.dart';
 import 'jsqrscanner.dart';
 
 class Scanner2 extends StatefulWidget {
-  const Scanner2({Key key}) : super(key: key);
+  const Scanner2({Key? key}) : super(key: key);
 
   @override
   _Scanner2State createState() => _Scanner2State();
 }
 
 class _Scanner2State extends State<Scanner2> {
-  Completer<String> _completer;
-  JsQRScanner _scanner;
+  late Completer<String> _completer;
+  JsQRScanner? _scanner;
   int _useCamera = -1;
-  List<dynamic> _cameras = new List<dynamic>();
+  List<dynamic>? _cameras;
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _Scanner2State extends State<Scanner2> {
 
   @override
   void dispose() {
-    document.getElementById("scandiv").remove();
+    document.getElementById("scandiv")!.remove();
     super.dispose();
   }
 
@@ -42,9 +42,8 @@ class _Scanner2State extends State<Scanner2> {
 
   Future<Iterable<dynamic>> _getCameras() {
     Completer<Iterable<dynamic>> completer = new Completer<Iterable<dynamic>>();
-    window.navigator.mediaDevices.enumerateDevices().then((devices) {
-      completer
-          .complete(devices.where((device) => device.kind == 'videoinput'));
+    window.navigator.mediaDevices!.enumerateDevices().then((devices) {
+      completer.complete(devices.where((device) => device.kind == 'videoinput'));
     }).catchError((error) {
       completer.complete([]);
     });
@@ -72,9 +71,7 @@ class _Scanner2State extends State<Scanner2> {
     // script.setAttribute('src',
     //     'assets/packages/barcode_scan_web/assets/jsqrscanner.nocache.js');
     _createHTML();
-    document
-        .querySelector('#toolbar p')
-        .addEventListener('click', (event) => _onCloseByUser());
+    document.querySelector('#toolbar p')!.addEventListener('click', (event) => _onCloseByUser());
     setProperty(window, 'JsQRScannerReady', allowInterop(this.scannerReady));
     _completer = new Completer<String>();
     return _completer.future;
@@ -82,9 +79,7 @@ class _Scanner2State extends State<Scanner2> {
 
   void _ensureMediaDevicesSupported() {
     if (window.navigator.mediaDevices == null) {
-      throw PlatformException(
-          code: 'CAMERA_ACCESS_NOT_SUPPORTED',
-          message: "Camera access not supported by browser");
+      throw PlatformException(code: 'CAMERA_ACCESS_NOT_SUPPORTED', message: "Camera access not supported by browser");
     }
   }
 
@@ -116,7 +111,7 @@ class _Scanner2State extends State<Scanner2> {
       <div id="rightbottom"></div>
     </div>
     ''';
-    document.body.append(containerDiv);
+    document.body!.append(containerDiv);
   }
 
   void onQRCodeScanned(String scannedText) {
@@ -133,28 +128,25 @@ class _Scanner2State extends State<Scanner2> {
 
   void _onCloseByUser() {
     _close();
-    _completer.completeError(PlatformException(
-        code: 'USER_CANCELED', message: 'User closed the scan window'));
+    _completer.completeError(PlatformException(code: 'USER_CANCELED', message: 'User closed the scan window'));
   }
 
   void _close() {
     if (_scanner != null) {
-      _scanner.removeFrom(document.getElementById('scanner'));
-      _scanner.stopScanning();
+      _scanner!.removeFrom(document.getElementById('scanner'));
+      _scanner!.stopScanning();
     }
-    document.getElementById('container').remove();
+    document.getElementById('container')!.remove();
   }
 
   void scannerReady() {
     window.navigator.getUserMedia(video: true).then((stream) {
-      window.navigator.mediaDevices.enumerateDevices().then((devices) {
-        _cameras =
-            devices.where((device) => device.kind == 'videoinput').toList();
-        _scanner = JsQRScanner(allowInterop(this.onQRCodeScanned),
-            allowInterop(this.provideVideo));
-        _scanner.setSnapImageMaxSize(300);
+      window.navigator.mediaDevices!.enumerateDevices().then((devices) {
+        _cameras = devices.where((device) => device.kind == 'videoinput').toList();
+        _scanner = JsQRScanner(allowInterop(this.onQRCodeScanned), allowInterop(this.provideVideo));
+        _scanner!.setSnapImageMaxSize(300);
         var scannerParentElement = document.getElementById('scanner');
-        _scanner.appendTo(scannerParentElement);
+        _scanner!.appendTo(scannerParentElement);
       }).catchError((onError) => _reject(onError));
     }).catchError((onError) => _reject(onError));
   }
@@ -162,21 +154,17 @@ class _Scanner2State extends State<Scanner2> {
   Promise<MediaStream> provideVideo() {
     var videoPromise;
     if (_useCamera < 0) {
-      videoPromise = getUserMedia(new UserMediaOptions(
-          video: new VideoOptions(facingMode: 'environment')));
+      videoPromise = getUserMedia(new UserMediaOptions(video: new VideoOptions(facingMode: 'environment')));
     } else {
-      videoPromise = getUserMedia(new UserMediaOptions(
-          video: new VideoOptions(
-              deviceId:
-                  new DeviceIdOptions(exact: _cameras[_useCamera].deviceId))));
+      videoPromise =
+          getUserMedia(new UserMediaOptions(video: new VideoOptions(deviceId: new DeviceIdOptions(exact: _cameras?[_useCamera].deviceId))));
     }
     videoPromise.then(null, allowInterop(_reject));
     return videoPromise;
   }
 
   void _reject(reject) {
-    _completer.completeError(PlatformException(
-        code: 'PERMISSION_NOT_GRANTED', message: reject.toString()));
+    _completer.completeError(PlatformException(code: 'PERMISSION_NOT_GRANTED', message: reject.toString()));
     _close();
   }
 
