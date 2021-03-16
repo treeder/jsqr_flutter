@@ -23,7 +23,7 @@ class Scanner extends StatefulWidget {
 
   static Future<bool> cameraAvailable() async {
     List<dynamic> sources =
-        await html.window.navigator.mediaDevices.enumerateDevices();
+        await html.window.navigator.mediaDevices!.enumerateDevices();
     print("sources:");
     // List<String> vidIds = [];
     bool hasCam = false;
@@ -39,16 +39,16 @@ class Scanner extends StatefulWidget {
 }
 
 class _ScannerState extends State<Scanner> {
-  html.MediaStream _localStream;
+  html.MediaStream? _localStream;
   // html.CanvasElement canvas;
   // html.CanvasRenderingContext2D ctx;
   bool _inCalling = false;
   bool _isTorchOn = false;
-  html.MediaRecorder _mediaRecorder;
+  html.MediaRecorder? _mediaRecorder;
   bool get _isRec => _mediaRecorder != null;
-  Timer timer;
-  String code;
-  String _errorMsg;
+  Timer? timer;
+  String? code;
+  String? _errorMsg;
   var front = false;
   var video;
   String viewID = "your-view-id";
@@ -96,7 +96,7 @@ class _ScannerState extends State<Scanner> {
 
   void cancel() {
     if (timer != null) {
-      timer.cancel();
+      timer!.cancel();
       timer = null;
     }
     if (_inCalling) {
@@ -158,7 +158,7 @@ class _ScannerState extends State<Scanner> {
   Future<void> _stopStream() async {
     try {
       // await _localStream.dispose();
-      _localStream.getTracks().forEach((track) {
+      _localStream!.getTracks().forEach((track) {
         if (track.readyState == 'live') {
           track.stop();
         }
@@ -173,7 +173,7 @@ class _ScannerState extends State<Scanner> {
   }
 
   _toggleCamera() async {
-    final videoTrack = _localStream
+    final videoTrack = _localStream!
         .getVideoTracks()
         .firstWhere((track) => track.kind == 'video');
     // await videoTrack.switchCamera();
@@ -193,7 +193,7 @@ class _ScannerState extends State<Scanner> {
     // canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0);
     html.ImageData imgData =
-        ctx.getImageData(0, 0, canvas.width, canvas.height);
+        ctx.getImageData(0, 0, canvas.width!, canvas.height!);
     // print(imgData);
     var code = jsQR(imgData.data, canvas.width, canvas.height);
     // print("CODE: $code");
@@ -209,7 +209,7 @@ class _ScannerState extends State<Scanner> {
     }
   }
 
-  Future<String> _captureImage() async {
+  Future<String?> _captureImage() async {
     if (_localStream == null) {
       print("localstream is null, can't capture frame");
       return null;
@@ -227,7 +227,7 @@ class _ScannerState extends State<Scanner> {
   @override
   Widget build(BuildContext context) {
     if (_errorMsg != null) {
-      return Center(child: Text(_errorMsg));
+      return Center(child: Text(_errorMsg!));
     }
     if (_localStream == null) {
       return Text("Loading...");
