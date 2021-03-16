@@ -1,10 +1,6 @@
 name: jsqr
 description: jsqr wrapper and widget for Flutter web.
-<<<<<<< HEAD
-version: 0.0.16
-=======
-version: 0.0.20
->>>>>>> 6717abeca416b80f099fffdc345fecb2e34c9332
+version: 0.1.1
 homepage: https://github.com/treeder
 repository: https://github.com/treeder/jsqr_flutter
 issue_tracker: https://github.com/treeder/jsqr_flutter/issues
