@@ -8,8 +8,6 @@ name: Dart
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -31,20 +29,32 @@ jobs:
         run: |
           git config --global user.email "treeder@gmail.com"
           git config --global user.name "Actions"
-      
-      - name: setup pub.dev credentials
-        run: | 
-          mkdir -p ~/.pub-cache 
-          cat <<EOF > ~/.pub-cache/credentials.json
-          {
-            "accessToken":"${{ secrets.PUB_ACCESS_TOKEN }}",
-            "refreshToken":"${{ secrets.PUB_REFRESH_TOKEN }}",
-            "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
-            "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
-            "expiration": 1570721159347
-          }
-          EOF
-      
+          
+      - name: bump
+        run: |
+          docker run --rm -i -v ${CURDIR}:/app -w /app treeder/bump --filename pubspec.yaml bump
+          git commit -am "bump version"
+          git push
+        
       - name: Publish
-        run: make publish
+        uses: sakebook/actions-flutter-pub-publisher@v1.3.1
+        with:
+          credential: ${{ secrets.PUB_CREDS_JSON }}
+          skip_test: true
+     
+#       - name: setup pub.dev credentials
+#         run: | 
+#           mkdir -p ~/.pub-cache 
+#           cat <<EOF > ~/.pub-cache/credentials.json
+#           {
+#             "accessToken":"${{ secrets.PUB_ACCESS_TOKEN }}",
+#             "refreshToken":"${{ secrets.PUB_REFRESH_TOKEN }}",
+#             "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
+#             "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
+#             "expiration": 1570721159347
+#           }
+#           EOF
+      
+#       - name: Publish
+#         run: make publish
         
