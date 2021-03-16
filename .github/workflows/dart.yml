@@ -44,6 +44,8 @@ jobs:
           cat <<EOF > ~/.pub-cache/credentials.json
           ${{ secrets.PUB_CREDS_JSON }}
           EOF
+          echo "CREDS:"
+          cat ~/.pub-cache/credentials.json
       - name: publish
         run: flutter pub publish -f
       
