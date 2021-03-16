@@ -26,6 +26,11 @@ jobs:
           channel: beta
       - name: Install dependencies
         run: flutter pub get
+        
+      - name: git config
+        run: |
+          git config --global user.email "treeder@gmail.com"
+          git config --global user.name "Actions"
       
       - name: Publish
         run: make publish
