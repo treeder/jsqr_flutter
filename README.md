@@ -12,7 +12,13 @@ Add this to `web/index.html`:
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
 ```
 
-## Scaning for QR codes
+Add this to pubspec:
+
+```
+jsqr: ^0.1.1
+```
+
+## Scanning for QR codes
 
 Example code:
 
@@ -41,4 +47,4 @@ See [/example](/example) for full example and usage.
 
 ## Image Capture
 
-You can also capture an image too by passing in `clickToCapture: true`, see [/example](/exaple) for how to use it.
+You can also capture an image too by passing in `clickToCapture: true`, see [/example](/example) for how to use it.
